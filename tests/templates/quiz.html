@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="container mt-5">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h3>{{ questions[current_question_index]['text'] }}</h3>
+    <form action="{{ url_for('submit', current_question_index=current_question_index) }}" method="post">
+        <ul class="list-group">
+            {% for answer in questions[current_question_index]['answers'] %}
+            <li class="list-group-item">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="user_answer" value="{{ answer }}" required>
+                    <label class="form-check-label">
+                        {{ answer }}
+                    </label>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+    <div class="mt-3">
+        <nav aria-label="Question navigation">
+            <ul class="pagination">
+                {% if current_question_index > 0 %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('index', current_question_index=current_question_index - 1) }}">Previous</a></li>
+                {% endif %}
+                <li class="page-item page-link">{{ current_question_index + 1 }}/{{ total_questions }}</li>
+                {% if current_question_index < total_questions - 1 %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('index', current_question_index=current_question_index + 1) }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <div class="mt-3">
+        <div class="d-flex flex-wrap">
+            {% for i in range(total_questions) %}
+                <a href="{{ url_for('index', current_question_index=i) }}" class="btn btn-secondary mb-2 mr-2 {{ 'btn-success' if i + 1 in session.get('correct_answers', []) else 'btn-danger' if i + 1 in session.get('incorrect_answers', []) else 'btn-secondary' }}">
+                    {{ i + 1 }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>    
+</body>
+</html>
